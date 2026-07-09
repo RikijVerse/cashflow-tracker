@@ -31,10 +31,21 @@ export default function Register() {
     setLoading(true)
     try {
       const { user } = await signUp(email, password)
+      
+      // Jika email sudah terdaftar, supabase mengembalikan array identities kosong
+      if (user?.identities?.length === 0) {
+        setError('Akun dengan email ini sudah pernah mendaftar. Silakan login.')
+        return
+      }
+
       if (!user?.confirmed_at) setSuccess(true)
       else navigate('/', { replace: true })
     } catch (err) {
-      setError(err.message || 'Pendaftaran gagal. Silakan coba lagi.')
+      if (err.message === 'User already registered') {
+        setError('Akun dengan email ini sudah pernah mendaftar. Silakan login.')
+      } else {
+        setError(err.message || 'Pendaftaran gagal. Silakan coba lagi.')
+      }
     } finally {
       setLoading(false)
     }
