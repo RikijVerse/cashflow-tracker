@@ -8,6 +8,7 @@ const WALLET_TYPES = [
   { value: 'cash',     label: 'Cash',     icon: '💵', color: 'var(--income)' },
   { value: 'bank',     label: 'Bank',     icon: '🏦', color: 'var(--indigo)' },
   { value: 'e-wallet', label: 'E-Wallet', icon: '📱', color: 'var(--cyan)'   },
+  { value: 'e-money',  label: 'E-Money',  icon: '💳', color: '#f59e0b'       },
 ]
 const TYPE_META = Object.fromEntries(WALLET_TYPES.map(t => [t.value, t]))
 
@@ -271,7 +272,7 @@ function WalletModal({ initial, onClose, onSaved }) {
             id="wallet-name"
             label="Nama Wallet"
             type="text"
-            placeholder="cth: BCA Utama, GoPay, Dompet"
+            placeholder="cth: BCA Utama, GoPay, Flazz, Dompet"
             value={name}
             onChange={(e) => setName(e.target.value)}
             required
