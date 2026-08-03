@@ -15,6 +15,32 @@ TRUNCATE TABLE budgets RESTART IDENTITY CASCADE;
 TRUNCATE TABLE wallets RESTART IDENTITY CASCADE;
 
 -- ============================================================================
+-- BAGIAN 1.5 — SETUP SINKRONISASI SALDO OTOMATIS
+-- Aplikasi baru mendukung edit & hapus transaksi. Saldo wallet dihitung ulang
+-- otomatis dari "saldo awal" + seluruh transaksi wallet tsb (via trigger).
+-- ============================================================================
+
+-- Hapus trigger lama (tidak dikenal/tidak terdokumentasi) pada transactions.
+DO $$
+DECLARE tr RECORD;
+BEGIN
+  FOR tr IN
+    SELECT tgname
+    FROM pg_trigger
+    WHERE tgrelid = 'transactions'::regclass
+      AND NOT tgisinternal
+  LOOP
+    EXECUTE format('DROP TRIGGER %I ON transactions', tr.tgname);
+  END LOOP;
+END $$;
+
+-- Kolom penghubung pasangan transfer (2 baris = 1 transfer).
+ALTER TABLE transactions ADD COLUMN IF NOT EXISTS transfer_id uuid;
+
+-- Kolom "saldo awal" wallet (nilai sebelum ada transaksi).
+ALTER TABLE wallets ADD COLUMN IF NOT EXISTS starting_balance numeric NOT NULL DEFAULT 0;
+
+-- ============================================================================
 -- BAGIAN 2 — SEED ULANG KATEGORI
 -- Kategori bersifat global (dipakai semua user), bukan data per-user.
 -- ============================================================================
@@ -157,6 +183,64 @@ ALTER TABLE categories ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS categories_select ON categories;
 CREATE POLICY categories_select ON categories
   FOR SELECT TO authenticated USING (true);
+
+-- 4.7 TRIGGER SINKRONISASI SALDO WALLET
+-- balance wallet = starting_balance + (total income) - (total expense)
+-- untuk semua transaksi milik wallet tsb. Dijalankan tiap insert/update/delete.
+CREATE OR REPLACE FUNCTION public.sync_wallet_balance()
+RETURNS trigger
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+DECLARE
+  w uuid;
+BEGIN
+  IF TG_OP = 'DELETE' THEN
+    w := OLD.wallet_id;
+    IF w IS NOT NULL THEN
+      UPDATE wallets
+      SET balance = starting_balance
+        + COALESCE((SELECT SUM(amount) FROM transactions WHERE wallet_id = w AND type = 'income'), 0)
+        - COALESCE((SELECT SUM(amount) FROM transactions WHERE wallet_id = w AND type = 'expense'), 0)
+      WHERE id = w;
+    END IF;
+  ELSIF TG_OP = 'UPDATE' THEN
+    IF OLD.wallet_id IS DISTINCT FROM NEW.wallet_id THEN
+      IF OLD.wallet_id IS NOT NULL THEN
+        UPDATE wallets
+        SET balance = starting_balance
+          + COALESCE((SELECT SUM(amount) FROM transactions WHERE wallet_id = OLD.wallet_id AND type = 'income'), 0)
+          - COALESCE((SELECT SUM(amount) FROM transactions WHERE wallet_id = OLD.wallet_id AND type = 'expense'), 0)
+        WHERE id = OLD.wallet_id;
+      END IF;
+    END IF;
+    w := NEW.wallet_id;
+    IF w IS NOT NULL THEN
+      UPDATE wallets
+      SET balance = starting_balance
+        + COALESCE((SELECT SUM(amount) FROM transactions WHERE wallet_id = w AND type = 'income'), 0)
+        - COALESCE((SELECT SUM(amount) FROM transactions WHERE wallet_id = w AND type = 'expense'), 0)
+      WHERE id = w;
+    END IF;
+  ELSE -- INSERT
+    w := NEW.wallet_id;
+    IF w IS NOT NULL THEN
+      UPDATE wallets
+      SET balance = starting_balance
+        + COALESCE((SELECT SUM(amount) FROM transactions WHERE wallet_id = w AND type = 'income'), 0)
+        - COALESCE((SELECT SUM(amount) FROM transactions WHERE wallet_id = w AND type = 'expense'), 0)
+      WHERE id = w;
+    END IF;
+  END IF;
+  RETURN NULL;
+END;
+$$;
+
+DROP TRIGGER IF EXISTS trg_sync_wallet_balance ON transactions;
+CREATE TRIGGER trg_sync_wallet_balance
+AFTER INSERT OR UPDATE OR DELETE ON transactions
+FOR EACH ROW EXECUTE FUNCTION public.sync_wallet_balance();
 
 -- ============================================================================
 -- BAGIAN 5 — STORAGE 'receipts' (foto struk)
