@@ -242,6 +242,23 @@ CREATE TRIGGER trg_sync_wallet_balance
 AFTER INSERT OR UPDATE OR DELETE ON transactions
 FOR EACH ROW EXECUTE FUNCTION public.sync_wallet_balance();
 
+-- RPC hitung ulang saldo satu wallet (dipakai setelah edit "saldo awal").
+CREATE OR REPLACE FUNCTION public.recalc_wallet_balance(p_wallet uuid)
+RETURNS void
+LANGUAGE sql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+  UPDATE wallets
+  SET balance = starting_balance
+    + COALESCE((SELECT SUM(amount) FROM transactions WHERE wallet_id = p_wallet AND type = 'income'), 0)
+    - COALESCE((SELECT SUM(amount) FROM transactions WHERE wallet_id = p_wallet AND type = 'expense'), 0)
+  WHERE id = p_wallet;
+$$;
+
+GRANT EXECUTE ON FUNCTION public.recalc_wallet_balance(uuid) TO authenticated;
+GRANT EXECUTE ON FUNCTION public.sync_wallet_balance() TO authenticated;
+
 -- ============================================================================
 -- BAGIAN 5 — STORAGE 'receipts' (foto struk)
 -- Bucket dibuat jika belum ada; policy: user hanya akses folder miliknya.
