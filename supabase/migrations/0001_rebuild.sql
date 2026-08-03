@@ -46,6 +46,9 @@ ALTER TABLE wallets ADD COLUMN IF NOT EXISTS starting_balance numeric NOT NULL D
 -- ============================================================================
 TRUNCATE TABLE categories RESTART IDENTITY CASCADE;
 
+-- Kategori bersifat global (dipakai semua user), user_id tidak wajib.
+ALTER TABLE categories ALTER COLUMN user_id DROP NOT NULL;
+
 INSERT INTO categories (name, icon, type) VALUES
   -- Pemasukan
   ('Gaji',        '💼', 'income'),
