@@ -64,7 +64,7 @@ export function Topbar({ onAdd }: { onAdd: () => void }) {
       </div>
 
       <div className="flex items-center gap-2">
-        <Button variant="primary" size="sm" onClick={onAdd} icon={<IconPlus size={16} />} className="hidden sm:inline-flex">
+        <Button variant="primary" size="sm" onClick={onAdd} icon={<IconPlus size={16} />} className="max-sm:hidden">
           Transaksi
         </Button>
 
