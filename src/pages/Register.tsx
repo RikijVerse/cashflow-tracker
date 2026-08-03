@@ -6,6 +6,39 @@ import { Button } from '../components/ui/Button'
 import { IconEye, IconEyeOff, IconLock, IconMail } from '../components/Icons'
 import { useAuth } from '../context/AuthContext'
 
+function isStrongPassword(password: string): boolean {
+  return (
+    password.length >= 8 &&
+    /[A-Z]/.test(password) &&
+    /[a-z]/.test(password) &&
+    /\d/.test(password) &&
+    /[^A-Za-z0-9]/.test(password)
+  )
+}
+
+function toIndonesianMessage(msg: string): string {
+  const lower = msg.toLowerCase()
+  if (lower.includes('already registered') || lower.includes('already been registered'))
+    return 'Akun dengan email ini sudah terdaftar. Silakan masuk menggunakan kata sandi Anda.'
+  if (lower.includes('invalid login credentials'))
+    return 'Email atau kata sandi tidak valid.'
+  if (lower.includes('email not confirmed'))
+    return 'Email belum dikonfirmasi. Cek kotak masuk Anda.'
+  if (lower.includes('unable to validate email'))
+    return 'Format email tidak valid.'
+  if (lower.includes('weak password') || lower.includes('password should be at least'))
+    return 'Kata sandi terlalu lemah. Gunakan minimal 8 karakter dengan huruf besar, huruf kecil, angka, dan simbol.'
+  if (lower.includes('signups not allowed') || lower.includes('signup disabled'))
+    return 'Pendaftaran baru sedang dinonaktifkan. Silakan hubungi admin.'
+  if (lower.includes('rate limit') || lower.includes('too many requests'))
+    return 'Terlalu banyak permintaan. Silakan coba lagi beberapa saat kemudian.'
+  if (lower.includes('network') || lower.includes('fetch failed'))
+    return 'Koneksi bermasalah. Periksa jaringan Anda lalu coba lagi.'
+  if (lower.includes('database error') || lower.includes('storage'))
+    return 'Terjadi kendala di server. Silakan coba lagi nanti.'
+  return msg || 'Gagal mendaftar. Coba lagi.'
+}
+
 export default function Register() {
   const { signUp } = useAuth()
   const navigate = useNavigate()
@@ -28,8 +61,10 @@ export default function Register() {
       setError('Format email tidak valid.')
       return false
     }
-    if (password.length < 8) {
-      setError('Kata sandi minimal 8 karakter.')
+    if (!isStrongPassword(password)) {
+      setError(
+        'Kata sandi harus mengandung minimal 8 karakter, huruf besar, huruf kecil, angka, dan simbol (misal: @, !).',
+      )
       return false
     }
     if (password !== confirm) {
@@ -42,10 +77,16 @@ export default function Register() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError('')
+    setRegisteredEmail(false)
     if (!validate()) return
     setLoading(true)
     try {
       const result = await signUp(email.trim(), password)
+      if (result.existingUser) {
+        setRegisteredEmail(true)
+        setError('Akun dengan email ini sudah terdaftar. Silakan masuk menggunakan kata sandi Anda.')
+        return
+      }
       if (result.needsConfirm) {
         setNeedsConfirm(true)
       } else {
@@ -53,13 +94,8 @@ export default function Register() {
       }
     } catch (err) {
       const msg = err instanceof Error ? err.message : ''
-      if (/already registered|already been registered/i.test(msg)) {
-        setRegisteredEmail(true)
-        setError('Email ini sudah terdaftar. Silakan masuk ke akun Anda.')
-      } else {
-        setRegisteredEmail(false)
-        setError(msg || 'Gagal mendaftar. Coba lagi.')
-      }
+      setRegisteredEmail(false)
+      setError(toIndonesianMessage(msg))
     } finally {
       setLoading(false)
     }
@@ -103,7 +139,7 @@ export default function Register() {
                 to="/login"
                 className="mt-2 inline-flex items-center gap-1.5 font-bold text-ink underline-offset-4 hover:underline"
               >
-                Masuk ke akun Anda →
+                Ke Halaman Login →
               </Link>
             )}
           </div>
@@ -127,7 +163,7 @@ export default function Register() {
         <Field
           label="Kata sandi"
           htmlFor="password"
-          hint="Minimal 8 karakter"
+          hint="Min. 8 karakter, huruf besar, huruf kecil, angka & simbol"
         >
           <div className="relative">
             <IconLock size={16} className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-ink-mute" />

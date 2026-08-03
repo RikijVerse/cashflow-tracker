@@ -8,7 +8,10 @@ interface AuthContextValue {
   session: Session | null
   loading: boolean
   signIn: (email: string, password: string) => Promise<void>
-  signUp: (email: string, password: string) => Promise<{ needsConfirm: boolean }>
+  signUp: (
+    email: string,
+    password: string,
+  ) => Promise<{ needsConfirm: boolean; existingUser: boolean }>
   resetPassword: (email: string) => Promise<void>
   updatePassword: (password: string) => Promise<void>
   signOut: () => Promise<void>
@@ -47,9 +50,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const signUp = async (email: string, password: string) => {
     const { data, error } = await supabase.auth.signUp({ email, password })
     if (error) throw error
+    // Supabase mengembalikan user TANPA error dan identities kosong ([])
+    // ketika email sudah terdaftar — tandai sebagai existing user.
+    const existingUser = !!data.user && !!data.user.identities && data.user.identities.length === 0
     const needsConfirm =
-      !!data.session === false && !!data.user && data.user.identities?.length === 1
-    return { needsConfirm }
+      !existingUser && !!data.session === false && !!data.user && data.user.identities?.length === 1
+    return { needsConfirm, existingUser }
   }
 
   const resetPassword = async (email: string) => {
