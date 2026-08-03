@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import type { Category, Transaction, TxType, Wallet } from '../../lib/types'
 import { supabase } from '../../lib/supabase'
 import { useAuthUser } from '../../context/AuthContext'
@@ -54,55 +54,64 @@ export function TransactionModal({ open, onClose, onSaved, editing }: Transactio
 
   useEffect(() => {
     if (!open) return
+    let active = true
     setError('')
     setLoadingData(true)
-    const txTypeForFetch = editing ? editing.type : txType
-    const fetchType = txTypeForFetch === 'transfer' ? 'expense' : txTypeForFetch
 
     Promise.all([
-      supabase
-        .from('categories')
-        .select('id, name, icon, type')
-        .eq('type', fetchType)
-        .order('name')
-        .then(({ data }) => data ?? []),
-      supabase
-        .from('wallets')
-        .select('*')
-        .eq('user_id', user.id)
-        .order('name')
-        .then(({ data }) => data ?? []),
-    ]).then(([catData, walletData]) => {
-      const cats = catData as Category[]
-      const ws = walletData as Wallet[]
-      setCategories(cats)
-      setWallets(ws)
+      supabase.from('categories').select('id, name, icon, type').order('name'),
+      supabase.from('wallets').select('*').eq('user_id', user.id).order('name'),
+    ])
+      .then(([catRes, walletRes]) => {
+        if (!active) return
+        if (catRes.error) throw catRes.error
+        if (walletRes.error) throw walletRes.error
+        const cats = (catRes.data as Category[]) ?? []
+        const ws = (walletRes.data as Wallet[]) ?? []
+        setCategories(cats)
+        setWallets(ws)
 
-      if (editing) {
-        setTxType(editing.type)
-        setAmount(Number(editing.amount))
-        setCategoryId(editing.category_id ?? '')
-        setWalletId(editing.wallet_id ?? '')
-        setDate(editing.transaction_date)
-        setNote(editing.note ?? '')
-        setExistingReceipt(editing.receipt_url ?? null)
-      } else {
-        setTxType('expense')
-        setAmount(null)
-        setCategoryId(cats[0]?.id ?? '')
-        setWalletId(ws[0]?.id ?? '')
-        setToWalletId(ws[1]?.id ?? '')
-        setDate(todayStr())
-        setNote('')
-        setExistingReceipt(null)
-      }
-      setReceiptFile(null)
-      setReceiptPreview(null)
-      setLoadingData(false)
-    })
-  }, [open, editing, txType, user.id])
+        if (editing) {
+          setTxType(editing.type)
+          setAmount(Number(editing.amount))
+          setCategoryId(editing.category_id ?? '')
+          setWalletId(editing.wallet_id ?? '')
+          setDate(editing.transaction_date)
+          setNote(editing.note ?? '')
+          setExistingReceipt(editing.receipt_url ?? null)
+        } else {
+          setTxType('expense')
+          setAmount(null)
+          setCategoryId(cats.find((c) => c.type === 'expense')?.id ?? '')
+          setWalletId(ws[0]?.id ?? '')
+          setToWalletId(ws[1]?.id ?? '')
+          setDate(todayStr())
+          setNote('')
+          setExistingReceipt(null)
+        }
+        setReceiptFile(null)
+        setReceiptPreview(null)
+      })
+      .catch((err) => {
+        if (active) {
+          setError(err instanceof Error ? err.message : 'Gagal memuat data. Coba lagi.')
+        }
+      })
+      .finally(() => {
+        if (active) setLoadingData(false)
+      })
+
+    return () => {
+      active = false
+    }
+  }, [open, editing, user.id])
 
   const isTransfer = txType === 'transfer'
+
+  const visibleCategories = useMemo(
+    () => categories.filter((c) => c.type === (isTransfer ? 'expense' : txType)),
+    [categories, txType, isTransfer],
+  )
 
   const handleTypeChange = (t: TxType) => {
     setTxType(t)
@@ -292,7 +301,7 @@ export function TransactionModal({ open, onClose, onSaved, editing }: Transactio
               onChange={(e) => setCategoryId(e.target.value)}
             >
               <option value="">Tanpa kategori</option>
-              {categories.map((c) => (
+              {visibleCategories.map((c) => (
                 <option key={c.id} value={c.id}>
                   {c.icon} {c.name}
                 </option>
