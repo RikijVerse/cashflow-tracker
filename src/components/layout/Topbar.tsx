@@ -6,6 +6,7 @@ import { useAuth } from '../../context/AuthContext'
 import { useTheme } from '../../context/ThemeContext'
 import {
   IconLogout,
+  IconMenu,
   IconMoon,
   IconPlus,
   IconSettings,
@@ -30,7 +31,7 @@ function pageTitle(pathname: string): string {
   return match ? match[1] : 'Arus Kas'
 }
 
-export function Topbar({ onAdd }: { onAdd: () => void }) {
+export function Topbar({ onAdd, onOpenMore }: { onAdd: () => void; onOpenMore: () => void }) {
   const { pathname } = useLocation()
   const { user, signOut } = useAuth()
   const { resolved, toggle } = useTheme()
@@ -64,6 +65,15 @@ export function Topbar({ onAdd }: { onAdd: () => void }) {
       </div>
 
       <div className="flex items-center gap-2">
+        <button
+          type="button"
+          onClick={onOpenMore}
+          aria-label="Buka menu"
+          className="grid size-9 place-items-center rounded-xl border border-line bg-surface text-ink-soft transition-colors hover:text-ink lg:hidden"
+        >
+          <IconMenu size={18} />
+        </button>
+
         <Button variant="primary" size="sm" onClick={onAdd} icon={<IconPlus size={16} />} className="hidden sm:inline-flex">
           Transaksi
         </Button>

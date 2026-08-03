@@ -122,6 +122,7 @@ export default function Transactions() {
     let income = 0
     let expense = 0
     for (const tx of filtered) {
+      if (tx.transfer_id || tx.type === 'transfer') continue
       if (tx.type === 'income') income += Number(tx.amount)
       else if (tx.type === 'expense') expense += Number(tx.amount)
     }
@@ -313,8 +314,8 @@ export default function Transactions() {
       ) : (
         <div className="flex flex-col gap-4">
           {grouped.map(([date, items]) => {
-            const dayIncome = items.filter((t) => t.type === 'income').reduce((s, t) => s + Number(t.amount), 0)
-            const dayExpense = items.filter((t) => t.type === 'expense').reduce((s, t) => s + Number(t.amount), 0)
+            const dayIncome = items.filter((t) => !t.transfer_id && t.type === 'income').reduce((s, t) => s + Number(t.amount), 0)
+            const dayExpense = items.filter((t) => !t.transfer_id && t.type === 'expense').reduce((s, t) => s + Number(t.amount), 0)
             return (
               <Card key={date} padded={false}>
                 <div className="flex items-center justify-between border-b border-line px-4 py-2.5 sm:px-5">

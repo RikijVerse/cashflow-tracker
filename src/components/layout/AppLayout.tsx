@@ -3,6 +3,7 @@ import { Outlet } from 'react-router-dom'
 import { Sidebar } from './Sidebar'
 import { Topbar } from './Topbar'
 import { BottomNav } from './BottomNav'
+import { MoreSheet } from './MoreSheet'
 import { TransactionModal } from '../transactions/TransactionModal'
 import { Toaster } from '../ui/Toaster'
 import { emitRefresh } from '../../lib/events'
@@ -18,6 +19,7 @@ export function AppLayout() {
     }
   })
   const [quickAddOpen, setQuickAddOpen] = useState(false)
+  const [moreOpen, setMoreOpen] = useState(false)
 
   const toggleCollapse = () => {
     setCollapsed((c) => {
@@ -35,7 +37,7 @@ export function AppLayout() {
       <Sidebar collapsed={collapsed} onToggleCollapse={toggleCollapse} />
 
       <div className={['transition-[margin] duration-200', collapsed ? 'lg:ml-[76px]' : 'lg:ml-64'].join(' ')}>
-        <Topbar onAdd={() => setQuickAddOpen(true)} />
+        <Topbar onAdd={() => setQuickAddOpen(true)} onOpenMore={() => setMoreOpen(true)} />
 
         <main className="px-4 pb-28 pt-6 sm:px-6 lg:px-8 lg:pb-10">
           <div className="mx-auto max-w-6xl">
@@ -44,7 +46,9 @@ export function AppLayout() {
         </main>
       </div>
 
-      <BottomNav onAdd={() => setQuickAddOpen(true)} />
+      <BottomNav onAdd={() => setQuickAddOpen(true)} onOpenMore={() => setMoreOpen(true)} />
+
+      <MoreSheet open={moreOpen} onClose={() => setMoreOpen(false)} />
 
       <TransactionModal
         open={quickAddOpen}

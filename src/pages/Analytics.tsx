@@ -94,6 +94,7 @@ export default function Analytics() {
     let expense = 0
 
     for (const tx of transactions) {
+      if (tx.transfer_id || tx.type === 'transfer') continue
       const k = tx.transaction_date.slice(0, 7)
       const amt = Number(tx.amount)
       if (tx.type === 'income') {

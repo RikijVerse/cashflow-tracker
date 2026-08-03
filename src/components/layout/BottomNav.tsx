@@ -1,10 +1,12 @@
 import { NavLink, useLocation } from 'react-router-dom'
 import { IconAnalytics, IconDashboard, IconPlus, IconSettings, IconTransactions } from '../Icons'
 
-export function BottomNav({ onAdd }: { onAdd: () => void }) {
+const MORE_PATHS = ['/wallets', '/budgets', '/goals', '/bills', '/settings']
+
+export function BottomNav({ onAdd, onOpenMore }: { onAdd: () => void; onOpenMore: () => void }) {
   const location = useLocation()
   const isAnalytics = location.pathname.startsWith('/analytics')
-  const isSettings = location.pathname.startsWith('/settings')
+  const isMore = MORE_PATHS.some((p) => location.pathname.startsWith(p))
 
   return (
     <nav className="fixed inset-x-0 bottom-0 z-40 border-t border-line bg-surface/90 pb-[env(safe-area-inset-bottom)] backdrop-blur-lg lg:hidden">
@@ -34,16 +36,18 @@ export function BottomNav({ onAdd }: { onAdd: () => void }) {
           Analisis
         </NavLink>
 
-        <NavLink
-          to="/settings"
+        <button
+          type="button"
+          onClick={onOpenMore}
+          aria-label="Buka menu lainnya"
           className={[
             'flex flex-col items-center gap-1 py-2.5 text-[10px] font-semibold transition-colors',
-            isSettings ? 'text-ink' : 'text-ink-mute hover:text-ink-soft',
+            isMore ? 'text-ink' : 'text-ink-mute hover:text-ink-soft',
           ].join(' ')}
         >
-          <IconSettings size={21} />
+          <IconSettings size={21} className={isMore ? 'text-accent' : ''} />
           Lainnya
-        </NavLink>
+        </button>
       </div>
     </nav>
   )

@@ -104,6 +104,7 @@ export default function Dashboard() {
     const prevMk = monthKey(new Date(new Date().getFullYear(), new Date().getMonth() - 1, 1))
 
     for (const tx of transactions) {
+      if (tx.transfer_id || tx.type === 'transfer') continue
       const k = tx.transaction_date.slice(0, 7)
       const amt = Number(tx.amount)
       if (tx.type === 'income') {
@@ -138,6 +139,7 @@ export default function Dashboard() {
     const rows = months.map((m) => ({ label: m.label, Pemasukan: 0, Pengeluaran: 0 }))
     const idx = new Map(months.map((m, i) => [m.key, i]))
     for (const tx of transactions) {
+      if (tx.transfer_id || tx.type === 'transfer') continue
       const i = idx.get(tx.transaction_date.slice(0, 7))
       if (i === undefined) continue
       const amt = Number(tx.amount)
@@ -153,6 +155,7 @@ export default function Dashboard() {
     const mk = monthKey()
     const map = new Map<string, number>()
     for (const tx of transactions) {
+      if (tx.transfer_id || tx.type === 'transfer') continue
       if (tx.type !== 'expense' || tx.transaction_date.slice(0, 7) !== mk) continue
       const key = tx.category_id ?? 'null'
       map.set(key, (map.get(key) ?? 0) + Number(tx.amount))
