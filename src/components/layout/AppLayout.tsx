@@ -37,7 +37,7 @@ export function AppLayout() {
       <Sidebar collapsed={collapsed} onToggleCollapse={toggleCollapse} />
 
       <div className={['transition-[margin] duration-200', collapsed ? 'lg:ml-[76px]' : 'lg:ml-64'].join(' ')}>
-        <Topbar onAdd={() => setQuickAddOpen(true)} onOpenMore={() => setMoreOpen(true)} />
+        <Topbar onAdd={() => setQuickAddOpen(true)} />
 
         <main className="px-4 pb-28 pt-6 sm:px-6 lg:px-8 lg:pb-10">
           <div className="mx-auto max-w-6xl">
