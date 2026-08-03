@@ -39,6 +39,7 @@
   --color-surface: var(--app-surface);
   --color-surface-2: var(--app-surface-2);
   --color-surface-3: var(--app-surface-3);
+  --color-muted: var(--app-surface-2);
   --color-line: var(--app-line);
   --color-line-strong: var(--app-line-strong);
   --color-ink: var(--app-ink);

@@ -3,16 +3,16 @@ import { Logo } from './Logo'
 
 export function AuthShell({ children }: { children: ReactNode }) {
   return (
-    <div className="flex min-h-dvh bg-bg">
+    <div className="grid min-h-screen grid-cols-1 bg-bg lg:grid-cols-2">
       {/* Panel kiri (desktop) */}
-      <div className="relative hidden flex-1 flex-col justify-between overflow-hidden border-r border-line p-10 lg:flex">
+      <div className="relative hidden flex-col justify-between overflow-hidden border-r border-line bg-muted p-12 lg:flex">
         <div className="bg-dots absolute inset-0 opacity-60" />
         <div className="absolute -right-40 -top-40 size-96 rounded-full bg-accent/10 blur-3xl" />
         <div className="relative">
           <Logo size={44} />
         </div>
 
-        <div className="relative max-w-md">
+        <div className="relative max-w-lg">
           <p className="text-3xl font-bold leading-tight tracking-tight text-ink text-balance">
             Kendalikan uangmu, satu catatan setiap saat.
           </p>
@@ -41,7 +41,7 @@ export function AuthShell({ children }: { children: ReactNode }) {
       </div>
 
       {/* Panel form */}
-      <div className="flex w-full items-center justify-center px-4 py-10 sm:px-8">
+      <div className="flex w-full items-center justify-center p-8">
         <div className="w-full max-w-sm animate-slide-up">
           <div className="mb-8 flex items-center justify-center lg:hidden">
             <Logo size={42} />
