@@ -91,6 +91,15 @@ export default function Login() {
           </div>
         </Field>
 
+        <div className="-mt-1 flex justify-end">
+          <Link
+            to="/forgot-password"
+            className="text-xs font-semibold text-ink-soft underline-offset-4 hover:text-ink hover:underline"
+          >
+            Lupa kata sandi?
+          </Link>
+        </div>
+
         <Button type="submit" size="lg" fullWidth loading={loading} className="mt-2">
           Masuk
         </Button>

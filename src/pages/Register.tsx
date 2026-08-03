@@ -17,6 +17,7 @@ export default function Register() {
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
   const [needsConfirm, setNeedsConfirm] = useState(false)
+  const [registeredEmail, setRegisteredEmail] = useState(false)
 
   const validate = (): boolean => {
     if (!email.trim() || !password || !confirm) {
@@ -52,7 +53,13 @@ export default function Register() {
       }
     } catch (err) {
       const msg = err instanceof Error ? err.message : ''
-      setError(msg || 'Gagal mendaftar. Coba lagi.')
+      if (/already registered|already been registered/i.test(msg)) {
+        setRegisteredEmail(true)
+        setError('Email ini sudah terdaftar. Silakan masuk ke akun Anda.')
+      } else {
+        setRegisteredEmail(false)
+        setError(msg || 'Gagal mendaftar. Coba lagi.')
+      }
     } finally {
       setLoading(false)
     }
@@ -90,7 +97,15 @@ export default function Register() {
       <form onSubmit={handleSubmit} className="mt-8 flex flex-col gap-4">
         {error && (
           <div className="rounded-xl border border-expense/20 bg-expense/8 px-3.5 py-2.5 text-xs font-medium text-expense">
-            {error}
+            <p>{error}</p>
+            {registeredEmail && (
+              <Link
+                to="/login"
+                className="mt-2 inline-flex items-center gap-1.5 font-bold text-ink underline-offset-4 hover:underline"
+              >
+                Masuk ke akun Anda →
+              </Link>
+            )}
           </div>
         )}
 
