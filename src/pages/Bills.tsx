@@ -280,7 +280,8 @@ function PayModal({ open, onClose, bill, onPaid }: PayModalProps) {
         note: `Pembayaran ${bill.name}`.trim(),
         receipt_url: null,
         transfer_id: null,
-      })
+        bill_id: bill.id,
+   })
       if (err) throw err
       toast(`${bill.name} dicatat sebagai pengeluaran`, 'success')
       onPaid()
