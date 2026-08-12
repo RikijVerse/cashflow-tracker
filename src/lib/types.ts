@@ -25,6 +25,7 @@ export interface Transaction {
   category_id?: string | null
   wallet_id?: string
   transfer_id?: string | null
+  bill_id?: string | null
   transaction_date: string
   note?: string | null
   receipt_url?: string | null
