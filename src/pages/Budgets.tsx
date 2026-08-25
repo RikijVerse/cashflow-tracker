@@ -262,11 +262,11 @@ export default function Budgets() {
                 <div className="mt-2 flex items-center justify-between">
                   <p className="text-[11px] font-semibold text-ink-mute">{pct}% terpakai</p>
                   {over ? (
-                    <Badge variant="expense" dot>Melebihi {formatIDR(spent - allocated)}</Badge>
+                    <Badge variant="expense" dot>Melebihi <span className="blur-amount tnum">{formatIDR(spent - allocated)}</span></Badge>
                   ) : allocated - spent <= allocated * 0.15 ? (
                     <Badge variant="accent" dot>Hampir habis</Badge>
                   ) : (
-                    <Badge variant="income" dot>Sisa {formatIDR(allocated - spent)}</Badge>
+                    <Badge variant="income" dot>Sisa <span className="blur-amount tnum">{formatIDR(allocated - spent)}</span></Badge>
                   )}
                 </div>
               </Card>

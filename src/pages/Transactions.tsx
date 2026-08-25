@@ -238,9 +238,9 @@ export default function Transactions() {
       {/* Ringkasan hasil */}
       <div className="flex flex-wrap items-center gap-2 text-xs">
         <p className="text-ink-mute">{filtered.length} transaksi</p>
-        <Badge variant="income">Masuk {formatIDR(totals.income)}</Badge>
-        <Badge variant="expense">Keluar {formatIDR(totals.expense)}</Badge>
-        <Badge variant="neutral">Selisih {formatIDR(totals.income - totals.expense)}</Badge>
+        <Badge variant="income">Masuk <span className="blur-amount tnum">{formatIDR(totals.income)}</span></Badge>
+        <Badge variant="expense">Keluar <span className="blur-amount tnum">{formatIDR(totals.expense)}</span></Badge>
+        <Badge variant="neutral">Selisih <span className="blur-amount tnum">{formatIDR(totals.income - totals.expense)}</span></Badge>
         {hasFilters && (
           <button
             type="button"
@@ -321,8 +321,8 @@ export default function Transactions() {
                 <div className="flex items-center justify-between border-b border-line px-4 py-2.5 sm:px-5">
                   <p className="text-xs font-bold text-ink">{formatDate(date)}</p>
                   <div className="flex items-center gap-3 text-[11px] font-medium">
-                    {dayIncome > 0 && <span className="text-income">+{formatIDR(dayIncome)}</span>}
-                    {dayExpense > 0 && <span className="text-expense">−{formatIDR(dayExpense)}</span>}
+                    {dayIncome > 0 && <span className="text-income blur-amount tnum">+{formatIDR(dayIncome)}</span>}
+                    {dayExpense > 0 && <span className="text-expense blur-amount tnum">−{formatIDR(dayExpense)}</span>}
                   </div>
                 </div>
                 <ul className="divide-y divide-line">

@@ -449,7 +449,7 @@ export default function Analytics() {
                         <p className="text-[13px] font-semibold text-ink">{c.cat?.name ?? 'Lainnya'}</p>
                         <p className="text-[11px] text-ink-mute">Rp {formatNumber(c.amt)}</p>
                       </div>
-                      <Badge variant="income">{formatIDR(c.amt)}</Badge>
+                      <Badge variant="income"><span className="blur-amount tnum">{formatIDR(c.amt)}</span></Badge>
                     </li>
                   ))}
                 </ul>
