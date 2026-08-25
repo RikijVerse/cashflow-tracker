@@ -39,7 +39,7 @@ export function StatCard({ label, value, icon, tone = 'neutral', trend, classNam
           </div>
         )}
       </div>
-      <p className={['tnum mt-2 text-xl font-bold tracking-tight', tones[tone]].join(' ')}>
+      <p className={['blur-amount tnum mt-2 text-xl font-bold tracking-tight', tones[tone]].join(' ')}>
         {value}
       </p>
       {trend && (

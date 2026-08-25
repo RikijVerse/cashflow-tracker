@@ -4,12 +4,15 @@ import { useRef } from 'react'
 import { useEffect } from 'react'
 import { useAuth } from '../../context/AuthContext'
 import { useTheme } from '../../context/ThemeContext'
+import { usePrivacy } from '../../context/PrivacyContext'
 import {
   IconLogout,
   IconMoon,
   IconPlus,
   IconSettings,
   IconSun,
+  IconEye,
+  IconEyeOff,
 } from '../Icons'
 import { initialsOf } from '../../lib/format'
 import { Button } from '../ui/Button'
@@ -34,6 +37,7 @@ export function Topbar({ onAdd }: { onAdd: () => void }) {
   const { pathname } = useLocation()
   const { user, signOut } = useAuth()
   const { resolved, toggle } = useTheme()
+  const { isBlurred, toggleBlur } = usePrivacy()
   const navigate = useNavigate()
   const [menuOpen, setMenuOpen] = useState(false)
   const menuRef = useRef<HTMLDivElement>(null)
@@ -67,6 +71,15 @@ export function Topbar({ onAdd }: { onAdd: () => void }) {
         <Button variant="primary" size="sm" onClick={onAdd} icon={<IconPlus size={16} />} className="max-sm:hidden">
           Transaksi
         </Button>
+
+        <button
+          type="button"
+          onClick={toggleBlur}
+          aria-label={isBlurred ? 'Tampilkan nominal' : 'Sembunyikan nominal'}
+          className="grid size-9 place-items-center rounded-xl border border-line bg-surface text-ink-soft transition-colors hover:text-ink"
+        >
+          {isBlurred ? <IconEyeOff size={17} /> : <IconEye size={17} />}
+        </button>
 
         <button
           type="button"

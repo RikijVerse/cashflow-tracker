@@ -93,6 +93,15 @@
 }
 
 /* ============ Utilitas ============ */
+.privacy-mode .tnum,
+.privacy-mode .blur-amount {
+  filter: blur(6px);
+  opacity: 0.8;
+  user-select: none;
+  pointer-events: none;
+  transition: filter 0.2s ease, opacity 0.2s ease;
+}
+
 @utility tnum {
   font-variant-numeric: tabular-nums;
   letter-spacing: -0.01em;
