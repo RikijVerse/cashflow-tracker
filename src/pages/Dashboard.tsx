@@ -227,7 +227,7 @@ export default function Dashboard() {
               />
             ) : (
               <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={chartData} margin={{ top: 6, right: 6, left: 0, bottom: 0 }}>
+                <AreaChart data={chartData} margin={{ top: 6, right: 6, left: 12, bottom: 0 }}>
                   <defs>
                     <linearGradient id="gIncome" x1="0" y1="0" x2="0" y2="1">
                       <stop offset="0%" stopColor="var(--income)" stopOpacity={0.28} />
@@ -249,7 +249,7 @@ export default function Dashboard() {
                     tick={{ fontSize: 11, fill: 'var(--ink-mute)' }}
                     axisLine={false}
                     tickLine={false}
-                    width={54}
+                    width={90}
                     tickFormatter={(v) => formatNumber(Number(v))}
                   />
                   <Tooltip
