@@ -72,6 +72,12 @@ export function monthLabel(key: string): string {
   return `${monthShort[m - 1]} ${y}`
 }
 
+export function monthLabelShort(key: string, prevKey?: string): string {
+  const [y, m] = key.split('-').map(Number)
+  const prevYear = prevKey ? Number(prevKey.split('-')[0]) : y
+  return y !== prevYear ? `${monthShort[m - 1]} '${String(y).slice(2)}` : monthShort[m - 1]
+}
+
 export function daysInMonth(year: number, month0: number): number {
   return new Date(year, month0 + 1, 0).getDate()
 }

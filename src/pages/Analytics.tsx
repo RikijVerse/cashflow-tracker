@@ -15,7 +15,8 @@ import { useAuthUser } from '../context/AuthContext'
 import { usePrivacy } from '../context/PrivacyContext'
 import { supabase } from '../lib/supabase'
 import type { Category, Transaction } from '../lib/types'
-import { formatIDR, formatNumber, monthKey, monthLabel } from '../lib/format'
+import { formatIDR, formatNumber, monthKey, monthLabelShort } from '../lib/format'
+import { useIsMobile } from '../hooks/useIsMobile'
 import { onRefresh } from '../lib/events'
 import { StatCard } from '../components/ui/StatCard'
 import { Card, CardHeader } from '../components/ui/Card'
@@ -49,6 +50,7 @@ export default function Analytics() {
   const [period, setPeriod] = useState<number>(6)
   const [transactions, setTransactions] = useState<Transaction[]>([])
   const [categories, setCategories] = useState<Category[]>([])
+  const isMobile = useIsMobile()
 
   useEffect(() => onRefresh(() => setRefreshKey((k) => k + 1)), [])
 
@@ -84,7 +86,9 @@ export default function Analytics() {
     const months: { key: string; label: string }[] = []
     for (let i = period - 1; i >= 0; i -= 1) {
       const d = new Date(now.getFullYear(), now.getMonth() - i, 1)
-      months.push({ key: monthKey(d), label: monthLabel(monthKey(d)) })
+      const k = monthKey(d)
+      const prevK = months.length > 0 ? months[months.length - 1].key : undefined
+      months.push({ key: k, label: monthLabelShort(k, prevK) })
     }
     const rows = months.map((m) => ({ label: m.label, Pemasukan: 0, Pengeluaran: 0 }))
     const idx = new Map(months.map((m, i) => [m.key, i]))
@@ -245,6 +249,7 @@ export default function Analytics() {
                     tick={{ fontSize: 11, fill: 'var(--ink-mute)' }}
                     axisLine={false}
                     tickLine={false}
+                    interval={isMobile && period >= 12 ? 1 : 0}
                   />
                   <YAxis
                     tick={{ fontSize: 11, fill: 'var(--ink-mute)' }}

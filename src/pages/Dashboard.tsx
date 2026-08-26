@@ -14,6 +14,7 @@ import { usePrivacy } from '../context/PrivacyContext'
 import { supabase } from '../lib/supabase'
 import type { Bill, Budget, Transaction, Wallet } from '../lib/types'
 import { formatDateShort, formatIDR, formatNumber, monthKey, monthLabel } from '../lib/format'
+import { useIsMobile } from '../hooks/useIsMobile'
 import { onRefresh } from '../lib/events'
 import { StatCard } from '../components/ui/StatCard'
 import { Card, CardHeader } from '../components/ui/Card'
@@ -56,6 +57,7 @@ export default function Dashboard() {
   const [transactions, setTransactions] = useState<Transaction[]>([])
   const [budgets, setBudgets] = useState<Budget[]>([])
   const [bills, setBills] = useState<Bill[]>([])
+  const isMobile = useIsMobile()
 
   useEffect(() => onRefresh(() => setRefreshKey((k) => k + 1)), [])
 
@@ -244,6 +246,7 @@ export default function Dashboard() {
                     tick={{ fontSize: 11, fill: 'var(--ink-mute)' }}
                     axisLine={false}
                     tickLine={false}
+                    interval={isMobile ? 1 : 0}
                   />
                   <YAxis
                     tick={{ fontSize: 11, fill: 'var(--ink-mute)' }}
