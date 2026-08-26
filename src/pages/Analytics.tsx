@@ -12,6 +12,7 @@ import {
   YAxis,
 } from 'recharts'
 import { useAuthUser } from '../context/AuthContext'
+import { usePrivacy } from '../context/PrivacyContext'
 import { supabase } from '../lib/supabase'
 import type { Category, Transaction } from '../lib/types'
 import { formatIDR, formatNumber, monthKey, monthLabel } from '../lib/format'
@@ -42,6 +43,7 @@ const EXPENSE_EMOJI = '💸'
 
 export default function Analytics() {
   const user = useAuthUser()
+  const { isBlurred } = usePrivacy()
   const [loading, setLoading] = useState(true)
   const [refreshKey, setRefreshKey] = useState(0)
   const [period, setPeriod] = useState<number>(6)
@@ -263,7 +265,7 @@ export default function Analytics() {
                                 <span className="size-2 rounded-full" style={{ background: p.color }} />
                                 {p.name}
                               </span>
-                              <span className="tnum font-semibold text-ink">{formatIDR(Number(p.value))}</span>
+                              <span className="tnum font-semibold text-ink">{isBlurred ? 'Rp••••••' : formatIDR(Number(p.value))}</span>
                             </p>
                           ))}
                         </div>
@@ -308,7 +310,7 @@ export default function Analytics() {
                             return (
                               <div className="rounded-xl border border-line bg-surface px-3.5 py-2.5 text-xs shadow-xl">
                                 <p className="text-ink-soft">{p.name}</p>
-                                <p className="tnum mt-0.5 font-bold text-ink">{formatIDR(Number(p.value))}</p>
+                                <p className="tnum mt-0.5 font-bold text-ink">{isBlurred ? 'Rp••••••' : formatIDR(Number(p.value))}</p>
                               </div>
                             )
                           }}

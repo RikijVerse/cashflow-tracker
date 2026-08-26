@@ -10,6 +10,7 @@ import {
   YAxis,
 } from 'recharts'
 import { useAuthUser } from '../context/AuthContext'
+import { usePrivacy } from '../context/PrivacyContext'
 import { supabase } from '../lib/supabase'
 import type { Bill, Budget, Transaction, Wallet } from '../lib/types'
 import { formatDateShort, formatIDR, formatNumber, monthKey, monthLabel } from '../lib/format'
@@ -48,6 +49,7 @@ function nextDueText(bill: Bill): { text: string; tone: 'expense' | 'accent' | '
 
 export default function Dashboard() {
   const user = useAuthUser()
+  const { isBlurred } = usePrivacy()
   const [loading, setLoading] = useState(true)
   const [refreshKey, setRefreshKey] = useState(0)
   const [wallets, setWallets] = useState<Wallet[]>([])
@@ -262,7 +264,7 @@ export default function Dashboard() {
                                 <span className="size-2 rounded-full" style={{ background: p.color }} />
                                 {p.name}
                               </span>
-                              <span className="tnum font-semibold text-ink">{formatIDR(Number(p.value))}</span>
+                              <span className="tnum font-semibold text-ink">{isBlurred ? 'Rp••••••' : formatIDR(Number(p.value))}</span>
                             </p>
                           ))}
                         </div>
