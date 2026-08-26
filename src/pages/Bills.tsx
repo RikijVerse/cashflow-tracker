@@ -20,6 +20,7 @@ import {
   IconPlus,
   IconTrash,
 } from '../components/Icons'
+import { PrivacyValue } from '../components/ui/PrivacyValue'
 
 function nextDue(bill: Bill): { due: Date; days: number } {
   const now = new Date()
@@ -383,7 +384,7 @@ export default function Bills() {
       <div className="flex items-center justify-between">
         <p className="text-xs text-ink-mute">
           Total tagihan aktif:{' '}
-          <span className="tnum font-bold text-ink">{formatIDR(monthlyTotal)}</span> / bulan ·{' '}
+          <span className="tnum font-bold text-ink"><PrivacyValue value={formatIDR(monthlyTotal)} /></span> / bulan ·{' '}
           {formatNumber(bills.filter((b) => b.active).length)} tagihan
         </p>
         <Button onClick={() => { setEditing(null); setModalOpen(true) }} icon={<IconPlus size={16} />}>
@@ -431,7 +432,7 @@ export default function Bills() {
                   </div>
 
                   <div className="text-right">
-                    <p className="tnum text-[13px] font-bold text-ink">{formatIDR(bill.amount)}</p>
+                    <p className="tnum text-[13px] font-bold text-ink"><PrivacyValue value={formatIDR(bill.amount)} /></p>
                     {bill.active && <Badge variant={badge.tone} dot className="mt-1">{badge.label}</Badge>}
                   </div>
 

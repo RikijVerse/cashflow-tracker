@@ -1,5 +1,7 @@
 import type { ReactNode } from 'react'
 import { IconArrowDownRight, IconArrowUpRight } from '../Icons'
+import { PrivacyValue } from './PrivacyValue'
+
 
 type Tone = 'neutral' | 'income' | 'expense' | 'accent'
 
@@ -39,8 +41,8 @@ export function StatCard({ label, value, icon, tone = 'neutral', trend, classNam
           </div>
         )}
       </div>
-      <p className={['blur-amount tnum mt-2 text-xl font-bold tracking-tight', tones[tone]].join(' ')}>
-        {value}
+      <p className={['tnum mt-2 text-xl font-bold tracking-tight', tones[tone]].join(' ')}>
+        <PrivacyValue value={value} />
       </p>
       {trend && (
         <div className="mt-1.5 flex items-center gap-1 text-[11px]">

@@ -14,6 +14,7 @@ import { Badge } from '../components/ui/Badge'
 import { Dropdown } from '../components/ui/Dropdown'
 import { ConfirmDialog } from '../components/ConfirmDialog'
 import { IconEdit, IconFlag, IconPlus, IconTrash } from '../components/Icons'
+import { PrivacyValue } from '../components/ui/PrivacyValue'
 
 const EMOJIS = ['🎯', '🏖️', '🏠', '🚗', '📱', '💻', '🎓', '💍', '🛵', '✈️', '🛍️', '💰']
 
@@ -372,13 +373,13 @@ export default function Goals() {
                   <div className="mt-4 flex items-center gap-4">
                     <ProgressRing value={current} max={target} />
                     <div className="min-w-0 flex-1">
-                      <p className="tnum text-lg font-bold tracking-tight text-ink">{formatIDR(current)}</p>
-                      <p className="tnum text-[11px] text-ink-mute">dari {formatIDR(target)}</p>
+                      <p className="tnum text-lg font-bold tracking-tight text-ink"><PrivacyValue value={formatIDR(current)} /></p>
+                      <p className="tnum text-[11px] text-ink-mute">dari <PrivacyValue value={formatIDR(target)} /></p>
                       {done ? (
                         <Badge variant="income" dot className="mt-1.5">Tercapai 🎉</Badge>
                       ) : (
                         <p className="tnum mt-1.5 text-[11px] font-semibold text-ink-soft">
-                          {formatIDR(target - current)} lagi
+                          <PrivacyValue value={formatIDR(target - current)} /> lagi
                         </p>
                       )}
                     </div>

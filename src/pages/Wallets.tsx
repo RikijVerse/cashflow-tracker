@@ -14,6 +14,7 @@ import { Dropdown } from '../components/ui/Dropdown'
 import { ConfirmDialog } from '../components/ConfirmDialog'
 import { StatCard } from '../components/ui/StatCard'
 import { IconCoins, IconEdit, IconPlus, IconTrash, IconWallet } from '../components/Icons'
+import { PrivacyValue } from '../components/ui/PrivacyValue'
 
 const WALLET_TYPES = [
   { value: 'cash', label: 'Tunai', icon: '💵' },
@@ -236,10 +237,10 @@ export default function Wallets() {
                   <p className="text-[11px] text-ink-mute">{info.label}</p>
 
                   <p className="tnum mt-3 text-2xl font-bold tracking-tight text-ink">
-                    {formatIDR(wallet.balance)}
+                    <PrivacyValue value={formatIDR(wallet.balance)} />
                   </p>
                   <p className="tnum mt-0.5 text-[11px] text-ink-mute">
-                    Saldo awal {formatNumber(wallet.starting_balance)}
+                    Saldo awal <PrivacyValue value={formatNumber(wallet.starting_balance)} />
                   </p>
                 </div>
               </Card>

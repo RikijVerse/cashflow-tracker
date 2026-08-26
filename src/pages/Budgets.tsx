@@ -15,6 +15,7 @@ import { Badge } from '../components/ui/Badge'
 import { Dropdown } from '../components/ui/Dropdown'
 import { ConfirmDialog } from '../components/ConfirmDialog'
 import { IconBudget, IconEdit, IconPlus, IconTrash } from '../components/Icons'
+import { PrivacyValue } from '../components/ui/PrivacyValue'
 
 interface BudgetModalProps {
   open: boolean
@@ -203,8 +204,8 @@ export default function Budgets() {
     <div className="flex flex-col gap-5">
       <div className="flex items-center justify-between">
         <p className="text-xs text-ink-mute">
-          Alokasi bulan ini: <span className="tnum font-bold text-ink">{formatIDR(totals.allocated)}</span> · Terpakai:{' '}
-          <span className="tnum font-bold text-ink">{formatIDR(totals.spent)}</span>
+          Alokasi bulan ini: <span className="tnum font-bold text-ink"><PrivacyValue value={formatIDR(totals.allocated)} /></span> · Terpakai:{' '}
+          <span className="tnum font-bold text-ink"><PrivacyValue value={formatIDR(totals.spent)} /></span>
         </p>
         <Button onClick={() => { setEditing(null); setModalOpen(true) }} icon={<IconPlus size={16} />}>
           Budget
@@ -254,19 +255,19 @@ export default function Budgets() {
                 </div>
 
                 <div className="mb-2 flex items-end justify-between">
-                  <p className="tnum text-2xl font-bold tracking-tight text-ink">{formatIDR(spent)}</p>
-                  <p className="tnum text-xs text-ink-mute">dari {formatIDR(allocated)}</p>
+                  <p className="tnum text-2xl font-bold tracking-tight text-ink"><PrivacyValue value={formatIDR(spent)} /></p>
+                  <p className="tnum text-xs text-ink-mute">dari <PrivacyValue value={formatIDR(allocated)} /></p>
                 </div>
 
                 <ProgressBar value={spent} max={allocated} />
                 <div className="mt-2 flex items-center justify-between">
                   <p className="text-[11px] font-semibold text-ink-mute">{pct}% terpakai</p>
                   {over ? (
-                    <Badge variant="expense" dot>Melebihi <span className="blur-amount tnum">{formatIDR(spent - allocated)}</span></Badge>
+                    <Badge variant="expense" dot>Melebihi <PrivacyValue value={formatIDR(spent - allocated)} /></Badge>
                   ) : allocated - spent <= allocated * 0.15 ? (
                     <Badge variant="accent" dot>Hampir habis</Badge>
                   ) : (
-                    <Badge variant="income" dot>Sisa <span className="blur-amount tnum">{formatIDR(allocated - spent)}</span></Badge>
+                    <Badge variant="income" dot>Sisa <PrivacyValue value={formatIDR(allocated - spent)} /></Badge>
                   )}
                 </div>
               </Card>

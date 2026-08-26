@@ -21,6 +21,7 @@ import { Card, CardHeader } from '../components/ui/Card'
 import { Badge } from '../components/ui/Badge'
 import { EmptyState, PageLoader } from '../components/ui/State'
 import { ProgressBar } from '../components/ui/ProgressBar'
+import { PrivacyValue } from '../components/ui/PrivacyValue'
 import {
   IconChartPie,
   IconCircleDollar,
@@ -322,7 +323,7 @@ export default function Analytics() {
                         <span className="min-w-0 flex-1 truncate text-xs font-medium text-ink-soft">
                           {c.cat?.icon ?? EXPENSE_EMOJI} {c.cat?.name ?? 'Lainnya'}
                         </span>
-                        <span className="tnum text-xs font-bold text-ink">{formatIDR(c.amt)}</span>
+                        <span className="tnum text-xs font-bold text-ink"><PrivacyValue value={formatIDR(c.amt)} /></span>
                       </li>
                     ))}
                   </ul>
@@ -340,7 +341,7 @@ export default function Analytics() {
                     <li key={w.name}>
                       <div className="mb-1.5 flex items-center justify-between gap-3">
                         <p className="text-[13px] font-semibold text-ink">{w.name}</p>
-                        <p className="tnum text-[11px] text-ink-mute">{formatIDR(w.amt)}</p>
+                        <p className="tnum text-[11px] text-ink-mute"><PrivacyValue value={formatIDR(w.amt)} /></p>
                       </div>
                       <ProgressBar value={w.amt} max={maxWallet} />
                     </li>
@@ -364,7 +365,7 @@ export default function Analytics() {
                     <p className="mt-1.5 text-sm font-bold text-ink">
                       {topCat.cat?.icon ?? EXPENSE_EMOJI} {topCat.cat?.name ?? 'Lainnya'}
                     </p>
-                    <p className="tnum mt-1 text-xs font-semibold text-expense">{formatIDR(topCat.amt)}</p>
+                    <p className="tnum mt-1 text-xs font-semibold text-expense"><PrivacyValue value={formatIDR(topCat.amt)} /></p>
                     <div className="mt-2">
                       <ProgressBar value={topCat.amt} max={maxCat} tone="expense" />
                     </div>
@@ -381,7 +382,7 @@ export default function Analytics() {
                     <p className="mt-1.5 text-sm font-bold text-ink">
                       {topIncome[0].cat?.icon ?? '💰'} {topIncome[0].cat?.name ?? 'Lainnya'}
                     </p>
-                    <p className="tnum mt-1 text-xs font-semibold text-income">{formatIDR(topIncome[0].amt)}</p>
+                    <p className="tnum mt-1 text-xs font-semibold text-income"><PrivacyValue value={formatIDR(topIncome[0].amt)} /></p>
                   </>
                 ) : (
                   <p className="mt-1.5 text-sm text-ink-mute">Belum ada data.</p>
@@ -390,7 +391,7 @@ export default function Analytics() {
 
               <div className="rounded-2xl bg-surface-2 p-4">
                 <p className="text-[11px] font-medium text-ink-mute">Rata-rata pengeluaran/bulan</p>
-                <p className="tnum mt-1.5 text-sm font-bold text-ink">{formatIDR(avgMonthly)}</p>
+                <p className="tnum mt-1.5 text-sm font-bold text-ink"><PrivacyValue value={formatIDR(avgMonthly)} /></p>
                 <p className="mt-1 text-[11px] text-ink-mute">
                   {period > 0 ? `dari ${period} bulan terakhir` : '-'}
                 </p>
@@ -401,7 +402,7 @@ export default function Analytics() {
                 {bestMonth && bestMonth.value > 0 ? (
                   <>
                     <p className="mt-1.5 text-sm font-bold text-ink">{bestMonth.label}</p>
-                    <p className="tnum mt-1 text-xs font-semibold text-income">+{formatIDR(bestMonth.value)}</p>
+                    <p className="tnum mt-1 text-xs font-semibold text-income">+<PrivacyValue value={formatIDR(bestMonth.value)} /></p>
                   </>
                 ) : (
                   <p className="mt-1.5 text-sm text-ink-mute">Belum ada surplus.</p>
@@ -447,9 +448,9 @@ export default function Analytics() {
                       </span>
                       <div className="min-w-0 flex-1">
                         <p className="text-[13px] font-semibold text-ink">{c.cat?.name ?? 'Lainnya'}</p>
-                        <p className="blur-amount tnum text-[11px] text-ink-mute">Rp {formatNumber(c.amt)}</p>
+                        <p className="tnum text-[11px] text-ink-mute"><PrivacyValue value={`Rp ${formatNumber(c.amt)}`} /></p>
                       </div>
-                      <Badge variant="income"><span className="blur-amount tnum">{formatIDR(c.amt)}</span></Badge>
+                      <Badge variant="income"><PrivacyValue value={formatIDR(c.amt)} /></Badge>
                     </li>
                   ))}
                 </ul>

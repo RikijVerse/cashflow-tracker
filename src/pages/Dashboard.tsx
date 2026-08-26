@@ -19,6 +19,7 @@ import { Card, CardHeader } from '../components/ui/Card'
 import { Badge } from '../components/ui/Badge'
 import { EmptyState, Skeleton } from '../components/ui/State'
 import { ProgressBar } from '../components/ui/ProgressBar'
+import { PrivacyValue } from '../components/ui/PrivacyValue'
 import {
   IconArrowDownRight,
   IconArrowUpRight,
@@ -330,7 +331,7 @@ export default function Dashboard() {
                       tx.type === 'income' ? 'text-income' : 'text-expense',
                     ].join(' ')}
                   >
-                    {tx.type === 'income' ? '+' : '−'}{formatIDR(tx.amount)}
+                    {tx.type === 'income' ? '+' : '−'}<PrivacyValue value={formatIDR(tx.amount)} />
                   </p>
                 </li>
               ))}
@@ -371,7 +372,7 @@ export default function Dashboard() {
                       <p className="text-[11px] text-ink-mute">Jatuh tempo setiap tanggal {bill.due_day}</p>
                     </div>
                     <div className="text-right">
-                      <p className="tnum text-[13px] font-bold text-ink">{formatIDR(bill.amount)}</p>
+                      <p className="tnum text-[13px] font-bold text-ink"><PrivacyValue value={formatIDR(bill.amount)} /></p>
                       <Badge variant={due.tone}>{due.text}</Badge>
                     </div>
                   </li>
@@ -410,7 +411,7 @@ export default function Dashboard() {
                         {b.categories?.name ?? 'Kategori'}
                       </p>
                       <p className="tnum text-[11px] text-ink-mute">
-                        {formatIDR(spent)} / {formatIDR(b.amount)}
+                        <PrivacyValue value={formatIDR(spent)} /> / <PrivacyValue value={formatIDR(b.amount)} />
                       </p>
                     </div>
                     <ProgressBar value={spent} max={b.amount} />
