@@ -1,16 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
-import {
-  Area,
-  AreaChart,
-  CartesianGrid,
-  Cell,
-  Pie,
-  PieChart,
-  ResponsiveContainer,
-  Tooltip,
-  XAxis,
-  YAxis,
-} from 'recharts'
+import { lazy, Suspense, useEffect, useMemo, useState } from 'react'
 import { useAuthUser } from '../context/AuthContext'
 import { usePrivacy } from '../context/PrivacyContext'
 import { supabase } from '../lib/supabase'
@@ -21,7 +9,7 @@ import { onRefresh } from '../lib/events'
 import { StatCard } from '../components/ui/StatCard'
 import { Card, CardHeader } from '../components/ui/Card'
 import { Badge } from '../components/ui/Badge'
-import { EmptyState, PageLoader } from '../components/ui/State'
+import { EmptyState, PageLoader, Skeleton } from '../components/ui/State'
 import { ProgressBar } from '../components/ui/ProgressBar'
 import { PrivacyValue } from '../components/ui/PrivacyValue'
 import {
@@ -41,6 +29,9 @@ const PERIODS = [
 const PIE_COLORS = ['#f59e0b', '#38bdf8', '#a78bfa', '#34d399', '#fb7185', '#facc15', '#2dd4bf', '#f472b6', '#94a3b8', '#60a5fa', '#fb923c', '#4ade80']
 
 const EXPENSE_EMOJI = '💸'
+
+const TrendChart = lazy(() => import('../components/analytics/TrendChart'))
+const CategoryDonut = lazy(() => import('../components/analytics/CategoryDonut'))
 
 export default function Analytics() {
   const user = useAuthUser()
@@ -225,118 +216,15 @@ export default function Analytics() {
       ) : (
         <>
           {/* Grafik tren */}
-          <Card>
-            <CardHeader
-              title="Tren arus kas"
-              subtitle="Pemasukan vs pengeluaran per bulan"
-            />
-            <div className="h-64">
-              <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={series} margin={{ top: 6, right: 6, left: 12, bottom: 0 }}>
-                  <defs>
-                    <linearGradient id="aInc" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="0%" stopColor="var(--income)" stopOpacity={0.28} />
-                      <stop offset="100%" stopColor="var(--income)" stopOpacity={0} />
-                    </linearGradient>
-                    <linearGradient id="aExp" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="0%" stopColor="var(--expense)" stopOpacity={0.28} />
-                      <stop offset="100%" stopColor="var(--expense)" stopOpacity={0} />
-                    </linearGradient>
-                  </defs>
-                  <CartesianGrid strokeDasharray="3 3" stroke="var(--line)" vertical={false} />
-                  <XAxis
-                    dataKey="label"
-                    tick={{ fontSize: 11, fill: 'var(--ink-mute)' }}
-                    axisLine={false}
-                    tickLine={false}
-                    interval={isMobile && period >= 12 ? 1 : 0}
-                  />
-                  <YAxis
-                    tick={{ fontSize: 11, fill: 'var(--ink-mute)' }}
-                    axisLine={false}
-                    tickLine={false}
-                    width={90}
-                    tickFormatter={(v) => formatNumber(Number(v))}
-                  />
-                  <Tooltip
-                    content={({ active, payload, label }) => {
-                      if (!active || !payload?.length) return null
-                      return (
-                        <div className="rounded-xl border border-line bg-surface px-3.5 py-2.5 text-xs shadow-xl">
-                          <p className="mb-1.5 font-semibold text-ink">{label}</p>
-                          {payload.map((p) => (
-                            <p key={p.dataKey as string} className="flex items-center justify-between gap-4 py-0.5">
-                              <span className="flex items-center gap-1.5 text-ink-soft">
-                                <span className="size-2 rounded-full" style={{ background: p.color }} />
-                                {p.name}
-                              </span>
-                              <span className="tnum font-semibold text-ink">{isBlurred ? 'Rp••••••' : formatIDR(Number(p.value))}</span>
-                            </p>
-                          ))}
-                        </div>
-                      )
-                    }}
-                  />
-                  <Area type="monotone" dataKey="Pemasukan" stroke="var(--income)" strokeWidth={2} fill="url(#aInc)" />
-                  <Area type="monotone" dataKey="Pengeluaran" stroke="var(--expense)" strokeWidth={2} fill="url(#aExp)" />
-                </AreaChart>
-              </ResponsiveContainer>
-            </div>
-          </Card>
+          <Suspense fallback={<Skeleton className="h-64" />}>
+            <TrendChart series={series} isMobile={isMobile} isBlurred={isBlurred} period={period} />
+          </Suspense>
 
           {/* Donat kategori + dompet */}
           <div className="grid gap-5 lg:grid-cols-2">
-            <Card>
-              <CardHeader title="Pengeluaran per kategori" subtitle={`Selama ${period} bulan`} />
-              {catExpense.length === 0 ? (
-                <EmptyState icon={<IconChartPie size={22} />} title="Tidak ada pengeluaran" description="Belum ada data pengeluaran pada periode ini." />
-              ) : (
-                <div className="grid items-center gap-4 sm:grid-cols-2">
-                  <div className="relative h-44">
-                    <ResponsiveContainer width="100%" height="100%">
-                      <PieChart>
-                        <Pie
-                          data={catExpense.map((c) => ({ name: c.cat?.name ?? 'Lainnya', value: c.amt }))}
-                          dataKey="value"
-                          nameKey="name"
-                          innerRadius={52}
-                          outerRadius={78}
-                          paddingAngle={2}
-                          strokeWidth={0}
-                        >
-                          {catExpense.map((_, i) => (
-                            <Cell key={i} fill={PIE_COLORS[i % PIE_COLORS.length]} />
-                          ))}
-                        </Pie>
-                        <Tooltip
-                          content={({ active, payload }) => {
-                            if (!active || !payload?.length) return null
-                            const p = payload[0]
-                            return (
-                              <div className="rounded-xl border border-line bg-surface px-3.5 py-2.5 text-xs shadow-xl">
-                                <p className="text-ink-soft">{p.name}</p>
-                                <p className="tnum mt-0.5 font-bold text-ink">{isBlurred ? 'Rp••••••' : formatIDR(Number(p.value))}</p>
-                              </div>
-                            )
-                          }}
-                        />
-                      </PieChart>
-                    </ResponsiveContainer>
-                  </div>
-                  <ul className="flex flex-col gap-2.5">
-                    {catExpense.slice(0, 6).map((c, i) => (
-                      <li key={c.id} className="flex items-center gap-2.5">
-                        <span className="size-2.5 shrink-0 rounded-full" style={{ background: PIE_COLORS[i % PIE_COLORS.length] }} />
-                        <span className="min-w-0 flex-1 truncate text-xs font-medium text-ink-soft">
-                          {c.cat?.icon ?? EXPENSE_EMOJI} {c.cat?.name ?? 'Lainnya'}
-                        </span>
-                        <span className="tnum text-xs font-bold text-ink"><PrivacyValue value={formatIDR(c.amt)} /></span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-            </Card>
+            <Suspense fallback={<Skeleton className="h-44" />}>
+              <CategoryDonut catExpense={catExpense} isBlurred={isBlurred} colors={PIE_COLORS} expenseEmoji={EXPENSE_EMOJI} />
+            </Suspense>
 
             <Card>
               <CardHeader title="Pengeluaran per dompet" subtitle={`Selama ${period} bulan`} />
