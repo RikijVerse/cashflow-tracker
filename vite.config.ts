@@ -41,13 +41,13 @@ export default defineConfig({
             type: 'image/png',
           },
           {
-            src: '/pwa-maskable-192.png?v=2',
+            src: '/pwa-maskable-192.png?v=3',
             sizes: '192x192',
             type: 'image/png',
             purpose: 'maskable',
           },
           {
-            src: '/pwa-maskable-512.png?v=2',
+            src: '/pwa-maskable-512.png?v=3',
             sizes: '512x512',
             type: 'image/png',
             purpose: 'maskable',
