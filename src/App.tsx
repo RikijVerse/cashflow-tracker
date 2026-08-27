@@ -4,6 +4,7 @@ import { AppLayout } from './components/layout/AppLayout'
 import { ProtectedRoute } from './components/ProtectedRoute'
 import { Logo } from './components/Logo'
 import { PageLoader } from './components/ui/State'
+import { OfflineBanner } from './components/OfflineBanner'
 
 const Login = lazy(() => import('./pages/Login'))
 const Register = lazy(() => import('./pages/Register'))
@@ -44,6 +45,7 @@ function NotFound() {
 export default function App() {
   return (
     <BrowserRouter>
+      <OfflineBanner />
       <Suspense fallback={<PageFallback />}>
         <Routes>
           <Route path="/login" element={<Login />} />
